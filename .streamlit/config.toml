@@ -1,0 +1,25 @@
+[theme]
+backgroundColor = "#0a1b38"
+primaryColor    = "#0db1f2"
+textColor       = "#FFFFFF"
+font            = "Open Sans"
+
+[theme.sidebar]
+backgroundColor = "#040b16"
+primaryColor    = "#0db1f2"
+textColor       = "#FFFFFF"
+font            = "Open Sans"
+
+[[theme.fontFaces]]
+family="Open Sans"
+url="app/static/OpenSans-Italic-VariableFont_wdth,wght.ttf"
+style="italic"
+[[theme.fontFaces]]
+family="Open Sans"
+url="app/static/OpenSans-VariableFont_wdth,wght.ttf"
+style="normal"
+
+
+
+[server]
+enableStaticServing = true
