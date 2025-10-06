@@ -115,7 +115,7 @@ if uploaded_file is not None:
             label="Download Modified Excel File",
             data=excel_buffer.getvalue(),
             file_name=f"modified_{uploaded_file.name}",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         )
 
         
