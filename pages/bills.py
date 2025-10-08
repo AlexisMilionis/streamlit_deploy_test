@@ -1,6 +1,8 @@
 import pandas as pd
 import streamlit as st  
 from io import BytesIO
+from src.single_file_checks import MonthlyDataChecks 
+from src.upload_file_checks import UploadedFileCheck
 
 st.header("Utility Bills Analysis", divider="grey")
 
@@ -67,58 +69,45 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# File uploader
-uploaded_file = st.file_uploader(
-    "Upload an Excel file", 
+
+# File uploader for Eurobank
+left_col, right_col = st.columns(2)
+uploaded_file_eurobank = left_col.file_uploader(
+    "Upload monthly Eurobank portfolio utilities file", 
     type=['xlsx', 'xls'],
-    help="Upload your utility bills Excel file",
-    width=1000,
+    # help="Upload monthly Eurobank portfolio utilities file",
+    width=500,
 )
 
-if uploaded_file is not None:
-    try:
-        # Read Excel file and get sheet names
-        excel_file = pd.ExcelFile(uploaded_file)
-        sheet_names = excel_file.sheet_names
-        
-        if len(sheet_names) > 1:
-            # Let user select sheet if multiple sheets exist
-            selected_sheet = st.selectbox("Select a sheet:", sheet_names)
-            df = pd.read_excel(uploaded_file, sheet_name=selected_sheet)
-        else:
-            df = pd.read_excel(uploaded_file)
-        
-        st.success(f"File '{uploaded_file.name}' uploaded successfully!")
-        
-        # Display file info
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.metric("Rows", len(df))
-        with col2:
-            st.metric("Columns", len(df.columns))
-        with col3:
-            st.metric("File Size", f"{uploaded_file.size} bytes")
-        
-        # Display DataFrame
-        st.write("**Data Preview:**")
-        st.dataframe(df, use_container_width=True)
-        
-        df['ΝΕΑ ΣΤΗΛΗ'] = "ΤΕΣΤ"
-        
-        # Convert DataFrame to Excel bytes
-        excel_buffer = BytesIO()
-        df.to_excel(excel_buffer, index=False)
-        excel_buffer.seek(0)
+# Checks for Eurobank excel file
+if uploaded_file_eurobank is not None:
+    excel_check = UploadedFileCheck(uploaded_file_eurobank, unique_id="eurobank")
+    df_eurobank = excel_check.exist_multiple_sheets()
+    # excel_check.display_uploaded_file_info()
 
-        # Download button
-        st.download_button(
-            label="Download Modified Excel File",
-            data=excel_buffer.getvalue(),
-            file_name=f"modified_{uploaded_file.name}",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        )
+# File uploader for Management
+uploaded_file_management = right_col.file_uploader(
+    "Upload monthly management portfolio utilities file", 
+    type=['xlsx', 'xls'],
+    # help="Upload monthly management portfolio utilities file",
+    width=500,
+)
 
-        
-    except Exception as e:
-        st.error(f"Error reading file: {str(e)}")
-        
+# Checks for Management excel file
+if uploaded_file_management is not None:
+    excel_check = UploadedFileCheck(uploaded_file_management, unique_id="management")
+    df_management = excel_check.exist_multiple_sheets()
+    # excel_check.display_uploaded_file_info()
+
+if uploaded_file_eurobank is not None and df_eurobank is not None and uploaded_file_management is not None and df_management is not None:
+    # Eurobank dataframe checks
+    eurobank_portfolio_checks = MonthlyDataChecks(df_eurobank, portfolio_name="Eurobank")
+    eurobank_portfolio_checks.single_file_checks_pipeline()
+
+            
+    st.success("Eurobank Portfolio validated successfully!")
+
+    management_portfolio_checks = MonthlyDataChecks(df_management, portfolio_name="Management")
+    management_portfolio_checks.single_file_checks_pipeline()
+    st.success("Management Portfolio validated successfully!")
+
