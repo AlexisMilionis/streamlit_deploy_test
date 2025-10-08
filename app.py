@@ -1,8 +1,17 @@
 import streamlit as st
 import pandas as pd
-
+from src.authentication import authenticate
+from constants import Constants
 
 # streamlit run app.py
+
+# Initialize session state
+if 'name' not in st.session_state:
+    st.session_state['name'] = None
+if 'authentication_status' not in st.session_state:
+    st.session_state['authentication_status'] = None
+if 'username' not in st.session_state:
+    st.session_state['username'] = None
 
 st.set_page_config(layout="wide")
 st.logo("static/logo-cps-compact-white@4x.png", size="large")
@@ -14,7 +23,7 @@ st.markdown("""
                 padding-top: 1rem;
                 padding-bottom: 0rem;
             }
-
+            
     </style>
     """, unsafe_allow_html=True)
 
@@ -27,11 +36,10 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-pg = st.navigation([st.Page("Utility Bills.py"), st.Page("Property Management.py"), st.Page("Budget & Forecast.py")])
-pg.run()
-
-
-
-
-
+constants = Constants()
+if constants.AUTHENTICATION:
+    authenticate()
+else:
+    pg = st.navigation(constants.navigation_menu)
+    pg.run()
 

@@ -1,0 +1,24 @@
+
+credentials:
+  usernames:
+    alexismilionis:
+      email: alexis.milionis@cerved.com
+      name: Alexis Milionis
+      password: "abc" 
+    alkistislemonaki:
+      email: akistis.lemonaki@cerved.com
+      name: Alkistis Lemonaki
+      password: "abc" 
+    iliasliapikos:
+      email: ilias.liapikos@cerved.com
+      name: Ilias Liapikos
+      password: "abc"
+
+
+cookie:
+  expiry_days: 0
+  key: "ff78cb0801688eaf335e8df32560b481dd055bfd8cadab4ca0959f407fae1559" 
+  name: miranda_papadopoulou
+# preauthorized:
+#   emails:
+#   - melsby@gmail.com
