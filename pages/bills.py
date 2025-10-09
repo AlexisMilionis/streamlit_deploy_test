@@ -76,38 +76,41 @@ uploaded_file_eurobank = left_col.file_uploader(
     "Upload monthly Eurobank portfolio utilities file", 
     type=['xlsx', 'xls'],
     # help="Upload monthly Eurobank portfolio utilities file",
-    width=500,
+    width=600,
 )
 
 # Checks for Eurobank excel file
 if uploaded_file_eurobank is not None:
-    excel_check = UploadedFileCheck(uploaded_file_eurobank, unique_id="eurobank")
-    df_eurobank = excel_check.exist_multiple_sheets()
-    # excel_check.display_uploaded_file_info()
+    with left_col:
+        excel_check = UploadedFileCheck(uploaded_file_eurobank, unique_id="eurobank")
+        df_eurobank = excel_check.exist_multiple_sheets()
+        # excel_check.display_uploaded_file_info()
 
 # File uploader for Management
 uploaded_file_management = right_col.file_uploader(
     "Upload monthly management portfolio utilities file", 
     type=['xlsx', 'xls'],
     # help="Upload monthly management portfolio utilities file",
-    width=500,
+    width=600,
 )
 
 # Checks for Management excel file
 if uploaded_file_management is not None:
-    excel_check = UploadedFileCheck(uploaded_file_management, unique_id="management")
-    df_management = excel_check.exist_multiple_sheets()
-    # excel_check.display_uploaded_file_info()
+    with right_col:
+        excel_check = UploadedFileCheck(uploaded_file_management, unique_id="management")
+        df_management = excel_check.exist_multiple_sheets()
+        # excel_check.display_uploaded_file_info()
 
 if uploaded_file_eurobank is not None and df_eurobank is not None and uploaded_file_management is not None and df_management is not None:
     # Eurobank dataframe checks
-    eurobank_portfolio_checks = MonthlyDataChecks(df_eurobank, portfolio_name="Eurobank")
-    eurobank_portfolio_checks.single_file_checks_pipeline()
+    with left_col:
+        eurobank_portfolio_checks = MonthlyDataChecks(df_eurobank, portfolio_name="Eurobank")
+        eurobank_portfolio_checks.single_file_checks_pipeline()
+                
+        st.success("Eurobank Portfolio validated successfully!")
 
-            
-    st.success("Eurobank Portfolio validated successfully!")
-
-    management_portfolio_checks = MonthlyDataChecks(df_management, portfolio_name="Management")
-    management_portfolio_checks.single_file_checks_pipeline()
-    st.success("Management Portfolio validated successfully!")
+    with right_col:
+        management_portfolio_checks = MonthlyDataChecks(df_management, portfolio_name="Management")
+        management_portfolio_checks.single_file_checks_pipeline()
+        st.success("Management Portfolio validated successfully!")
 
