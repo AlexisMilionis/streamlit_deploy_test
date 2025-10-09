@@ -76,7 +76,7 @@ uploaded_file_eurobank = left_col.file_uploader(
     "Upload monthly Eurobank portfolio utilities file", 
     type=['xlsx', 'xls'],
     # help="Upload monthly Eurobank portfolio utilities file",
-    width=600,
+    width="stretch",
 )
 
 # Checks for Eurobank excel file
@@ -91,7 +91,7 @@ uploaded_file_management = right_col.file_uploader(
     "Upload monthly management portfolio utilities file", 
     type=['xlsx', 'xls'],
     # help="Upload monthly management portfolio utilities file",
-    width=600,
+    width="stretch",
 )
 
 # Checks for Management excel file
@@ -107,14 +107,13 @@ if uploaded_file_eurobank is not None and df_eurobank is not None:
     with left_col:
         eurobank_portfolio_checks = MonthlyDataChecks(df_eurobank, portfolio_name="Eurobank")
         eurobank_portfolio_checks.single_file_checks_pipeline()   
-        st.success("Eurobank Portfolio validated successfully!")
+        
 
 if uploaded_file_management is not None and df_management is not None:
     # Management dataframe checks
     with right_col:
         management_portfolio_checks = MonthlyDataChecks(df_management, portfolio_name="Management")
         management_portfolio_checks.single_file_checks_pipeline()
-        st.success("Management Portfolio validated successfully!")
 
         
     # cf = ComparativeFile(current_portfolio=eurobank_portfolio_checks.portfolio, 
