@@ -129,6 +129,20 @@ class UploadedFileCheck:
         Shows metrics for the number of rows, columns, and file size
         in a three-column layout.
         """
+        
+        st.markdown("""
+            <style>
+            /* Target metric label */
+            [data-testid="stMetricLabel"] {
+                font-size: 12px !important;
+            }
+            
+            /* Target metric value */
+            [data-testid="stMetricValue"] {
+                font-size: 16px !important;
+            }
+            </style>
+        """, unsafe_allow_html=True)
         # Display file info
         col1, col2, col3 = st.columns(3)
         with col1:
