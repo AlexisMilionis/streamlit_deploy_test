@@ -2,7 +2,7 @@ import streamlit as st
 
 class Constants:
     
-    AUTHENTICATION = False
+    AUTHENTICATION = True
 
     navigation_menu = [
         st.Page("pages/bills.py", title="Utility Bills"), 

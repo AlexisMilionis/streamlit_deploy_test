@@ -101,16 +101,28 @@ if uploaded_file_management is not None:
         df_management = excel_check.exist_multiple_sheets()
         # excel_check.display_uploaded_file_info()
 
-if uploaded_file_eurobank is not None and df_eurobank is not None and uploaded_file_management is not None and df_management is not None:
-    # Eurobank dataframe checks
+# Eurobank dataframe checks
+if uploaded_file_eurobank is not None and df_eurobank is not None:
+    
     with left_col:
         eurobank_portfolio_checks = MonthlyDataChecks(df_eurobank, portfolio_name="Eurobank")
-        eurobank_portfolio_checks.single_file_checks_pipeline()
-                
+        eurobank_portfolio_checks.single_file_checks_pipeline()   
         st.success("Eurobank Portfolio validated successfully!")
 
+if uploaded_file_management is not None and df_management is not None:
+    # Management dataframe checks
     with right_col:
         management_portfolio_checks = MonthlyDataChecks(df_management, portfolio_name="Management")
         management_portfolio_checks.single_file_checks_pipeline()
         st.success("Management Portfolio validated successfully!")
 
+        
+    # cf = ComparativeFile(current_portfolio=eurobank_portfolio_checks.portfolio, 
+    #                      previous_portfolio=management_portfolio_checks.portfolio)
+    
+    
+    
+
+st.write("")
+st.write("")
+st.write("")
