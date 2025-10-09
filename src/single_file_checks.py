@@ -3,6 +3,9 @@ import pandas as pd
 import streamlit as st
 
 class MonthlyDataChecks:
+    column_names = Constants.COLUMN_NAMES
+    mandatory_columns = Constants.NON_NULLABLE_COLUMNS
+    
     def __init__(self, portfolio, portfolio_name):
         self.portfolio = portfolio
         self.column_names = Constants.COLUMN_NAMES
