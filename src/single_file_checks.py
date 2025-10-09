@@ -52,29 +52,35 @@ class MonthlyDataChecks:
         
     def single_file_checks_pipeline(self):
         # Check if all column are present
-        error_portfolio, missing_cols = self.exist_all_columns()
-        if error_portfolio:
-            st.error(f"Missing columns or different name in {self.portfolio_name} portfolio: {', '.join(missing_cols)}")
-        else: 
-            st.info(f"All required columns are present in {self.portfolio_name} portfolio.")
-        # Check for empty rows
-        num_empty_rows = self.exist_empty_rows()
-        if num_empty_rows != 0:
-            st.warning(f"{self.portfolio_name} portfolio has {num_empty_rows} completely empty rows, that are now deleted.")
-        else:
-            st.info(f"No completely empty rows found in {self.portfolio_name} portfolio.")
-            # Check for unfilled mandatory columns
-        mandatory_cols_unfilled = self.exist_unfilled_values_in_mandatory_columns()
-        if mandatory_cols_unfilled:
-            st.error(f"The following mandatory columns have missing values in {self.portfolio_name} portfolio: {', '.join(mandatory_cols_unfilled)}")
-        # Check for duplicates based on 'ΑΡ.ΠΑΡΑΣΤΑΤΙΚΟΥ' column
-        num_duplicates, all_duplicates = self.exist_duplicates()
-        if num_duplicates > 0:
-            st.error(f"{self.portfolio_name} portfolio has {num_duplicates}")
-            with st.expander("View duplicate rows based on 'ΑΡ.ΠΑΡΑΣΤΑΤΙΚΟΥ' column"):
-                st.dataframe(all_duplicates)
-        else:
-            st.info(f"No duplicate rows found in {self.portfolio_name} portfolio based on 'ΑΡ.ΠΑΡΑΣΤΑΤΙΚΟΥ' column.")
+        with st.spinner(text="Applying data checks..."):
+            error_portfolio, missing_cols = self.exist_all_columns()
+            if error_portfolio:
+                st.error(f"Missing columns or different name in {self.portfolio_name} portfolio: {', '.join(missing_cols)}")
+                return
+            else: 
+                st.info(f"All required columns are present in {self.portfolio_name} portfolio.")
+            # Check for empty rows
+            num_empty_rows = self.exist_empty_rows()
+            if num_empty_rows != 0:
+                st.warning(f"{self.portfolio_name} portfolio has {num_empty_rows} completely empty rows, that are now deleted.")
+            else:
+                st.info(f"No completely empty rows found in {self.portfolio_name} portfolio.")
+                # Check for unfilled mandatory columns
+            mandatory_cols_unfilled = self.exist_unfilled_values_in_mandatory_columns()
+            if mandatory_cols_unfilled:
+                st.error(f"The following mandatory columns have missing values in {self.portfolio_name} portfolio: {', '.join(mandatory_cols_unfilled)}")
+                return
+            # Check for duplicates based on 'ΑΡ.ΠΑΡΑΣΤΑΤΙΚΟΥ' column
+            num_duplicates, all_duplicates = self.exist_duplicates()
+            if num_duplicates > 0:
+                st.error(f"{self.portfolio_name} portfolio has {num_duplicates} rows")
+                with st.expander("View duplicate rows based on 'ΑΡ.ΠΑΡΑΣΤΑΤΙΚΟΥ' column"):
+                    st.dataframe(all_duplicates)
+                return
+            else:
+                st.info(f"No duplicate rows found in {self.portfolio_name} portfolio based on 'ΑΡ.ΠΑΡΑΣΤΑΤΙΚΟΥ' column.")
+
+            st.success(f"{self.portfolio_name} Portfolio validated successfully!")
 
 
     #TODO: check για ετταξη/απενταξη παροχών
