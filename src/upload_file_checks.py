@@ -191,6 +191,17 @@ class UploadedFileCheck:
                     self.display_uploaded_file_info()
                 return self.df
             
+            else:
+                # Single sheet - load automatically
+                self.df = pd.read_excel(self.uploaded_file)
+                
+                if self.df is not None:
+                    # st.success(f"File '{self.uploaded_file.name}' uploaded successfully!")
+                    self.display_uploaded_file_info()
+                
+                return self.df
+            
+            
         except Exception as e:
                 st.error(f"Error reading file: {str(e)}")
         
