@@ -3,6 +3,7 @@ import streamlit as st
 from io import BytesIO
 from src.single_file_checks import MonthlyDataChecks 
 from src.upload_file_checks import UploadedFileCheck
+from src.update_timeseries import TimeSeriesUpdate
 
 st.header("Utility Bills Analysis", divider="grey")
 
@@ -85,19 +86,30 @@ uploaded_file = right_col.file_uploader(
     # help="Upload monthly Eurobank portfolio utilities file",
     width="stretch",
 )
-# Checks for portfolio excel file
+
 if uploaded_file is not None:
+    
+    # Checks for portfolio excel file
     excel_check = UploadedFileCheck(uploaded_file, unique_id=portfolio_type.lower())
     df_portfolio = excel_check.exist_multiple_sheets()
 
-# Portfolio dataframe checks
+
 if uploaded_file is not None and df_portfolio is not None:
-    portfolio_checks = MonthlyDataChecks(df_portfolio, portfolio_name=portfolio_type.lower())
-    portfolio_checks.single_file_checks_pipeline()
-
-        
-
     
+    file_key = f"{uploaded_file.name}_{uploaded_file.size}_{portfolio_type}"
+    if 'processed_file' not in st.session_state or st.session_state.processed_file != file_key:
+        
+        st.session_state.processed_file = file_key
+        
+        # Portfolio dataframe checks
+        portfolio_checks = MonthlyDataChecks(df_portfolio, portfolio_name=portfolio_type.lower())
+        checks_passed = portfolio_checks.single_file_checks_pipeline()
+        if checks_passed is False:
+            st.stop()
+
+        # Append file to historical database
+        timeseries = TimeSeriesUpdate(df_portfolio, portfolio_type.lower())
+        timeseries.add_new_data()
 
 st.write("")
 st.write("")
