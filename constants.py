@@ -80,3 +80,7 @@ class Constants:
         'ΠΡΟΗΓ.ΕΝΔ.',
         'ΤΥΠΟΣ ΛΟΓΑΡΙΑΣΜΟΥ'
     ]
+    
+    TIMESERIES_PATH = "data/"
+    
+    EXPORT_PATH = "data/exports/"
