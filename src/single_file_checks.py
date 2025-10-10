@@ -1,7 +1,8 @@
 from constants import Constants
+from src.utils import animate_progress
 import pandas as pd
 import streamlit as st
-
+import time
 class MonthlyDataChecks:
     column_names = Constants.COLUMN_NAMES
     mandatory_columns = Constants.NON_NULLABLE_COLUMNS
@@ -51,37 +52,82 @@ class MonthlyDataChecks:
             return 0, None
         
     def single_file_checks_pipeline(self):
-        # Check if all column are present
-        with st.spinner(text="Applying data checks..."):
-            error_portfolio, missing_cols = self.exist_all_columns()
-            if error_portfolio:
-                st.error(f"Missing columns or different name in {self.portfolio_name} portfolio: {', '.join(missing_cols)}")
-                return
-            else: 
-                st.info(f"All required columns are present in {self.portfolio_name} portfolio.")
-            # Check for empty rows
-            num_empty_rows = self.exist_empty_rows()
-            if num_empty_rows != 0:
-                st.warning(f"{self.portfolio_name} portfolio has {num_empty_rows} completely empty rows, that are now deleted.")
-            else:
-                st.info(f"No completely empty rows found in {self.portfolio_name} portfolio.")
-                # Check for unfilled mandatory columns
-            mandatory_cols_unfilled = self.exist_unfilled_values_in_mandatory_columns()
-            if mandatory_cols_unfilled:
-                st.error(f"The following mandatory columns have missing values in {self.portfolio_name} portfolio: {', '.join(mandatory_cols_unfilled)}")
-                return
-            # Check for duplicates based on 'ΑΡ.ΠΑΡΑΣΤΑΤΙΚΟΥ' column
-            num_duplicates, all_duplicates = self.exist_duplicates()
-            if num_duplicates > 0:
-                st.error(f"{self.portfolio_name} portfolio has {num_duplicates} rows")
-                with st.expander("View duplicate rows based on 'ΑΡ.ΠΑΡΑΣΤΑΤΙΚΟΥ' column"):
-                    st.dataframe(all_duplicates)
-                return
-            else:
-                st.info(f"No duplicate rows found in {self.portfolio_name} portfolio based on 'ΑΡ.ΠΑΡΑΣΤΑΤΙΚΟΥ' column.")
+        # Initialize progress bar and status text
+        progress_bar = st.progress(0)
+        status_text = st.empty()
+        info_messages = []
+        
+        # Check 1: Column presence
+        status_text.text("Checking columns...")
+        progress_bar = animate_progress(progress_bar, 0, 25)
+        # progress_bar.progress(0)
+        error_portfolio, missing_cols = self.exist_all_columns()
+        if error_portfolio:
+            status_text.empty()
+            progress_bar.empty()
+            st.error(f"Missing columns or different name in {self.portfolio_name} portfolio: {', '.join(missing_cols)}")
+            return
+        else: 
+            info_placeholder = st.empty()
+            info_placeholder.success(f"No missing columns")
+            info_messages.append(info_placeholder)
+        
+        # Check 2: Empty rows
+        status_text.text("Checking for empty rows...")
+        progress_bar = animate_progress(progress_bar, 25, 50)
+        num_empty_rows = self.exist_empty_rows()
+        if num_empty_rows != 0:
+            st.warning(f"{self.portfolio_name} portfolio has {num_empty_rows} completely empty rows, that are now deleted.")
+        else:
+            info_placeholder = st.empty()
+            info_placeholder.success(f"No empty rows")
+            info_messages.append(info_placeholder)
+        
+        # Check 3: Mandatory columns
+        status_text.text("Checking mandatory columns...")
+        progress_bar = animate_progress(progress_bar, 50, 75)
+        mandatory_cols_unfilled = self.exist_unfilled_values_in_mandatory_columns()
+        if mandatory_cols_unfilled:
+            status_text.empty()
+            progress_bar.empty()
+            st.error(f"The following mandatory columns have missing values in {self.portfolio_name} portfolio: {', '.join(mandatory_cols_unfilled)}")
+            return
+        else:
+            info_placeholder = st.empty()
+            info_placeholder.success(f"No missing values in mandatory columns")
+            info_messages.append(info_placeholder)
+        
+        # Check 4: Duplicates
+        status_text.text("Checking for duplicates...")
+        progress_bar = animate_progress(progress_bar, 75, 100)
+        num_duplicates, all_duplicates = self.exist_duplicates()
+        if num_duplicates > 0:
+            status_text.empty()
+            progress_bar.empty()
+            st.error(f"{self.portfolio_name} portfolio has {num_duplicates} duplicate rows")
+            with st.expander("View duplicate rows based on 'ΑΡ.ΠΑΡΑΣΤΑΤΙΚΟΥ' column"):
+                st.dataframe(all_duplicates)
+            return
+        else:
+            info_placeholder = st.empty()
+            info_placeholder.success(f"No duplicate rows")
+            info_messages.append(info_placeholder)
 
-            st.success(f"{self.portfolio_name} Portfolio validated successfully!")
+        # Complete
+        status_text.text("Validation complete!")
+        time.sleep(1)
+        
+        # Clear all info messages
+        for info_msg in info_messages:
+            info_msg.empty()
+        
+        # Clear progress indicators after a moment
+        time.sleep(2)
+        # status_text.empty()
+        progress_bar.empty()
+    
+        # st.success(f"{self.portfolio_name} Portfolio validated successfully!")
 
 
-    #TODO: check για ετταξη/απενταξη παροχών
+    #TODO: check για ενταξη/απενταξη παροχών
     #TODO: check for large fluctuations in price for the same παροχη btw months
