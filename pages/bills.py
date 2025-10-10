@@ -6,6 +6,7 @@ from src.upload_file_checks import UploadedFileCheck
 
 st.header("Utility Bills Analysis", divider="grey")
 
+
 # Custom CSS for file uploader
 st.markdown("""
 <style>
@@ -69,57 +70,33 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+left_col, right_col = st.columns(spec=[0.3, 0.7])
+# Choose portfolio type
+portfolio_type = left_col.radio(
+    "Select portfolio type:",
+    ('Eurobank', 'Management'),
+    horizontal=False,
+)
 
-# File uploader for Eurobank
-left_col, right_col = st.columns(2)
-uploaded_file_eurobank = left_col.file_uploader(
-    "Upload monthly Eurobank portfolio utilities file", 
+# File uploader
+uploaded_file = right_col.file_uploader(
+    "Upload monthly portfolio utilities file", 
     type=['xlsx', 'xls'],
     # help="Upload monthly Eurobank portfolio utilities file",
     width="stretch",
 )
+# Checks for portfolio excel file
+if uploaded_file is not None:
+    excel_check = UploadedFileCheck(uploaded_file, unique_id=portfolio_type.lower())
+    df_portfolio = excel_check.exist_multiple_sheets()
 
-# Checks for Eurobank excel file
-if uploaded_file_eurobank is not None:
-    with left_col:
-        excel_check = UploadedFileCheck(uploaded_file_eurobank, unique_id="eurobank")
-        df_eurobank = excel_check.exist_multiple_sheets()
-        # excel_check.display_uploaded_file_info()
-
-# File uploader for Management
-uploaded_file_management = right_col.file_uploader(
-    "Upload monthly management portfolio utilities file", 
-    type=['xlsx', 'xls'],
-    # help="Upload monthly management portfolio utilities file",
-    width="stretch",
-)
-
-# Checks for Management excel file
-if uploaded_file_management is not None:
-    with right_col:
-        excel_check = UploadedFileCheck(uploaded_file_management, unique_id="management")
-        df_management = excel_check.exist_multiple_sheets()
-        # excel_check.display_uploaded_file_info()
-
-# Eurobank dataframe checks
-if uploaded_file_eurobank is not None and df_eurobank is not None:
-    
-    with left_col:
-        eurobank_portfolio_checks = MonthlyDataChecks(df_eurobank, portfolio_name="Eurobank")
-        eurobank_portfolio_checks.single_file_checks_pipeline()   
-        
-
-if uploaded_file_management is not None and df_management is not None:
-    # Management dataframe checks
-    with right_col:
-        management_portfolio_checks = MonthlyDataChecks(df_management, portfolio_name="Management")
-        management_portfolio_checks.single_file_checks_pipeline()
+# Portfolio dataframe checks
+if uploaded_file is not None and df_portfolio is not None:
+    portfolio_checks = MonthlyDataChecks(df_portfolio, portfolio_name=portfolio_type.lower())
+    portfolio_checks.single_file_checks_pipeline()
 
         
-    # cf = ComparativeFile(current_portfolio=eurobank_portfolio_checks.portfolio, 
-    #                      previous_portfolio=management_portfolio_checks.portfolio)
-    
-    
+
     
 
 st.write("")
