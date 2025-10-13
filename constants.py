@@ -84,3 +84,7 @@ class Constants:
     TIMESERIES_PATH = "data/"
     
     EXPORT_PATH = "data/exports/"
+    
+    MASTERFILE_PATH = "data/"
+    
+    PRIMARY_COLOR = "#0db1f2"
