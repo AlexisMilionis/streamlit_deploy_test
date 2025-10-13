@@ -43,11 +43,11 @@ def authenticate():
     """, unsafe_allow_html=True)
     
     st.markdown("""
-<style>
-    /* Style for logout button */
-    
-</style>
-""", unsafe_allow_html=True)
+        <style>
+            /* Style for logout button */
+            
+        </style>
+        """, unsafe_allow_html=True)
     
 
     with open('config.yaml') as file:
