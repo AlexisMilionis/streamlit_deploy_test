@@ -55,17 +55,17 @@ class TimeSeriesUpdate:
             info_messages.append(info_placeholder)
             
         # Check 3: Check if new data already in timeseries
-        supply_ids_timeseries = set(self.timeseries['ΑΡ.ΠΑΡΑΣΤΑΤΙΚΟΥ'].astype(str).unique())
-        supply_ids_newfile = set(self.new_file['ΑΡ.ΠΑΡΑΣΤΑΤΙΚΟΥ'].astype(str).unique())
-        common_ids = supply_ids_timeseries.intersection(supply_ids_newfile)
+        unique_invoice_timeseries = set(self.timeseries['ΑΡ.ΠΑΡΑΣΤΑΤΙΚΟΥ'].astype(str).unique())
+        unique_invoice_newfile = set(self.new_file['ΑΡ.ΠΑΡΑΣΤΑΤΙΚΟΥ'].astype(str).unique())
+        common_ids = unique_invoice_timeseries.intersection(unique_invoice_newfile)
         common_ids = list(common_ids)
         if common_ids:
             status_text.empty()
             progress_bar.empty()
-            if len(common_ids) == len(list(supply_ids_newfile)):
+            if len(common_ids) == len(list(unique_invoice_newfile)):
                 st.info(f"File already in database.")
             else:
-                st.info(f"{len(common_ids)}/{len(supply_ids_newfile)} records already in database.")
+                st.info(f"{len(common_ids)}/{len(unique_invoice_newfile)} records already in database.")
                 df_duplicates = self.new_file[self.new_file['ΑΡ.ΠΑΡΑΣΤΑΤΙΚΟΥ'].astype(str).isin(common_ids)]
                 st.error(f"{self.portfolio_type} portfolio has {len(df_duplicates)} duplicate rows with database")
                 with st.expander("View duplicate rows based on 'ΑΡ.ΠΑΡΑΣΤΑΤΙΚΟΥ' column"):
