@@ -110,7 +110,114 @@ if uploaded_file is not None and df_portfolio is not None:
         # Append file to historical database
         timeseries = TimeSeriesUpdate(df_portfolio, portfolio_type.lower())
         timeseries.add_new_data()
+        
+        # Check for new supply IDs
+        masterfile = MasterFileUpdate(df_portfolio, portfolio_type)
+        masterfile.update_masterfile()
+        
+        # # walker = pyg.walk(df_portfolio)
+        
+        st.session_state.df_portfolio = df_portfolio
+        
+    # This code runs on every rerun - outside the initialization block
+    st.subheader("KPIs Monthly Bill")
+    monthly_metrics = Metrics(df_portfolio)        
+    monthly_metrics.display_monthly_kpis()
+    monthly_metrics.build_scatterplot()
+    
+    st.markdown("""
+        <style>
+                /* Style for input fields (username and password) */
+                .stTextInput > div > div > input {
+                    background-color: #f0f8ff !important;
+                    border: 2px solid #0db1f2 !important;
+                    border-radius: 5px !important;
+                    color: #333 !important;
+                }
+                
+                /* Style for input fields on focus */
+                .stTextInput > div > div > input:focus {
+                    background-color: #e6f3ff !important;
+                    border-color: #0880bf !important;
+                    box-shadow: 0 0 5px rgba(13, 177, 242, 0.3) !important;
+                }
+                
+                /* Style for password input specifically if needed */
+                input[type="password"] {
+                    background-color: #f0f8ff !important;
+                    border: 2px solid #0db1f2 !important;
+                    border-radius: 5px !important;
+                    color: #333 !important;
+                }
 
+                [data-testid="stBaseButton-secondary"] {
+                    background-color: #0db1f2 !important;
+                    color: white !important;
+                    border: none !important;
+                    border-radius: 5px !important;
+        }
+
+        </style>
+        """, unsafe_allow_html=True)
+
+    monthly_supply_id_input = st.text_input(
+        "Enter Supply ID to retrieve information:",
+        placeholder="Type supply ID here..."
+    )
+    if monthly_supply_id_input:
+        monthly_metrics.display_supply_id_info(monthly_supply_id_input)
+
+    st.subheader("KPIs Historical Data")
+    eurobank_historical_db = pd.read_excel("data/eurobank_historical_db.xlsx")
+    historical_metrics = Metrics(eurobank_historical_db)
+    historical_metrics.display_historical_kpis()
+    st.markdown("""
+        <style>
+                /* Style for input fields (username and password) */
+                .stTextInput > div > div > input {
+                    background-color: #f0f8ff !important;
+                    border: 2px solid #0db1f2 !important;
+                    border-radius: 5px !important;
+                    color: #333 !important;
+                }
+                
+                /* Style for input fields on focus */
+                .stTextInput > div > div > input:focus {
+                    background-color: #e6f3ff !important;
+                    border-color: #0880bf !important;
+                    box-shadow: 0 0 5px rgba(13, 177, 242, 0.3) !important;
+                }
+                
+                /* Style for password input specifically if needed */
+                input[type="password"] {
+                    background-color: #f0f8ff !important;
+                    border: 2px solid #0db1f2 !important;
+                    border-radius: 5px !important;
+                    color: #333 !important;
+                }
+
+                [data-testid="stBaseButton-secondary"] {
+                    background-color: #0db1f2 !important;
+                    color: white !important;
+                    border: none !important;
+                    border-radius: 5px !important;
+        }
+
+        </style>
+        """, unsafe_allow_html=True)
+    supply_id_input = st.text_input(
+        "Enter Supply ID to retrieve historical information:",
+        placeholder="Type supply ID here..."
+    )
+    if supply_id_input:
+        historical_metrics.display_historical_supply_id_info(supply_id_input)
+
+st.write("")
+st.write("")
+st.write("")
+st.write("")
+st.write("")
+st.write("")
 st.write("")
 st.write("")
 st.write("")
