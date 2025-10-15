@@ -1,6 +1,35 @@
+"""
+Constants module for the Streamlit application.
+
+This module defines all constant values used throughout the application including
+column names, file paths, color schemes, and navigation configuration.
+"""
+
 import streamlit as st
+from typing import List
 
 class Constants:
+    """
+    Central configuration class containing all application constants.
+    
+    This class serves as a single source of truth for configuration values
+    used across the application, including file paths, column definitions,
+    validation rules, and UI styling constants.
+    
+    Attributes:
+        AUTHENTICATION (bool): Flag to enable/disable authentication.
+        navigation_menu (List[st.Page]): List of navigation pages for the app.
+        DATAPATH (str): Base path for input data files.
+        COLUMN_NAMES (List[str]): Expected column names for portfolio files.
+        NON_NULLABLE_COLUMNS (List[str]): Columns that must not contain null values.
+        TIMESERIES_PATH (str): Path for time series database files.
+        EXPORT_PATH (str): Path for exported files.
+        MASTERFILE_PATH (str): Path for master files.
+        BACKGROUND_COLOR (str): Hex color code for UI background.
+        PRIMARY_COLOR (str): Hex color code for primary UI elements.
+        DONUT_COLORING (List[str]): RGB color palette for donut charts.
+        DUAL_COLORING (List[str]): RGB color palette for dual-colored charts.
+    """
     
     AUTHENTICATION = False
 

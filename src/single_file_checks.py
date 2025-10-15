@@ -1,22 +1,70 @@
+"""
+Single file validation module for the Streamlit application.
+
+This module provides comprehensive data validation checks for uploaded monthly
+portfolio files, including column presence, empty rows, mandatory fields, and duplicates.
+"""
+
 from constants import Constants
 from src.utils import animate_progress
 import pandas as pd
 import streamlit as st
 import time
+from typing import List, Tuple, Optional
+
 class MonthlyDataChecks:
+    """
+    A class for performing validation checks on monthly portfolio data.
+    
+    This class provides methods to validate uploaded portfolio files against
+    expected schema and data quality requirements. It checks for missing columns,
+    empty rows, unfilled mandatory fields, and duplicate records.
+    
+    Attributes:
+        portfolio (pd.DataFrame): The portfolio DataFrame to validate.
+        portfolio_name (str): Name identifier for the portfolio (e.g., 'eurobank', 'management').
+        column_names (List[str]): Expected column names (class attribute from Constants).
+        mandatory_columns (List[str]): Columns that must not have null values (class attribute).
+    """
+    
     column_names = Constants.COLUMN_NAMES
     mandatory_columns = Constants.NON_NULLABLE_COLUMNS
     
-    def __init__(self, portfolio, portfolio_name):
+    def __init__(self, portfolio: pd.DataFrame, portfolio_name: str) -> None:
+        """
+        Initialize the MonthlyDataChecks with portfolio data.
+        
+        Args:
+            portfolio (pd.DataFrame): The portfolio DataFrame to validate.
+            portfolio_name (str): Name identifier for the portfolio.
+        
+        Returns:
+            None
+        """
         self.portfolio = portfolio
         self.portfolio_name = portfolio_name
 
-    def exist_all_columns(self):
+    def exist_all_columns(self) -> List[str]:
+        """
+        Check if all required columns are present in the portfolio.
+        
+        Returns:
+            List[str]: List of missing column names. Empty list if all columns present.
+        """
         missing_cols = [col for col in self.column_names if col not in self.portfolio.columns]
         return missing_cols
 
     
-    def exist_empty_rows(self):
+    def exist_empty_rows(self) -> int:
+        """
+        Check for and remove completely empty rows in the portfolio.
+        
+        Returns:
+            int: Number of empty rows that were removed. 0 if none found.
+            
+        Side Effects:
+            - Modifies self.portfolio by removing empty rows in place
+        """
         num_rows_before = len(self.portfolio)
         self.portfolio.dropna(how='all', inplace=True)
         num_rows_after = len(self.portfolio)
@@ -26,7 +74,14 @@ class MonthlyDataChecks:
             return 0
         
 
-    def exist_unfilled_values_in_mandatory_columns(self):
+    def exist_unfilled_values_in_mandatory_columns(self) -> List[str]:
+        """
+        Check if mandatory columns have any missing values.
+        
+        Returns:
+            List[str]: List of mandatory column names that contain null values.
+                      Empty list if all mandatory columns are filled.
+        """
         missing_columns = [col for col in self.mandatory_columns if col not in self.portfolio.columns]
         mandatory_cols_unfilled = []
         for col in self.mandatory_columns:
@@ -34,7 +89,18 @@ class MonthlyDataChecks:
                 mandatory_cols_unfilled.append(col)
         return mandatory_cols_unfilled
     
-    def exist_duplicates(self, cols="ΑΡ.ΠΑΡΑΣΤΑΤΙΚΟΥ"):
+    def exist_duplicates(self, cols: str = "ΑΡ.ΠΑΡΑΣΤΑΤΙΚΟΥ") -> Tuple[int, Optional[pd.DataFrame]]:
+        """
+        Check for duplicate rows based on specified column.
+        
+        Args:
+            cols (str, optional): Column name to check for duplicates. Defaults to "ΑΡ.ΠΑΡΑΣΤΑΤΙΚΟΥ".
+        
+        Returns:
+            Tuple[int, Optional[pd.DataFrame]]: A tuple containing:
+                - Number of duplicate rows found
+                - DataFrame containing all duplicate rows (including originals), or None if no duplicates
+        """
         duplicates = self.portfolio[cols].duplicated()
         num_duplicates = duplicates.sum()
         # Get duplicate rows
@@ -47,7 +113,28 @@ class MonthlyDataChecks:
         else:
             return 0, None
         
-    def single_file_checks_pipeline(self):
+    def single_file_checks_pipeline(self) -> bool:
+        """
+        Execute a complete validation pipeline for the portfolio file.
+        
+        This method runs all validation checks in sequence with visual progress
+        feedback. The pipeline includes:
+        1. Column presence check
+        2. Empty rows detection and removal
+        3. Mandatory columns validation
+        4. Duplicate rows detection
+        
+        The process is visualized with an animated progress bar and status messages.
+        
+        Returns:
+            bool: True if all validation checks pass, False if any check fails.
+            
+        Side Effects:
+            - Displays animated progress bar during checks
+            - Shows success/warning/error messages for each check
+            - Displays expandable DataFrames for duplicate rows
+            - Modifies self.portfolio by removing empty rows
+        """
         # Initialize progress bar and status text
         progress_bar = st.progress(0)
         status_text = st.empty()

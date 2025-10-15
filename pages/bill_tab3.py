@@ -1,8 +1,27 @@
+"""
+Bill Tab 3 - Comparison view for the Bills page.
+
+This module provides the third tab interface for comparing portfolio data
+and historical metrics.
+"""
+
 import streamlit as st
 import pandas as pd
 from src.generate_metrics import Metrics
 
-def create_tab3():
+def create_tab3() -> None:
+    """
+    Create and render the comparison tab interface.
+    
+    This function serves as a placeholder for future comparative analysis
+    features. Currently displays a placeholder message.
+    
+    Returns:
+        None
+        
+    Side Effects:
+        - Renders content in the Streamlit UI
+    """
     st.write("Placeholder for Comparison Tab")
     
     

@@ -1,10 +1,46 @@
+"""
+Authentication module for the Streamlit application.
+
+This module provides user authentication functionality using the streamlit_authenticator
+library, including login forms, logout functionality, and session management.
+"""
+
 import streamlit as st
 import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
 from constants import Constants
+from typing import NoReturn
 
-def authenticate():
+def authenticate() -> None:
+    """
+    Handle user authentication for the Streamlit application.
+    
+    This function manages the complete authentication workflow including:
+    - Loading credentials from config.yaml
+    - Applying custom CSS styling for login forms
+    - Creating and managing the authentication widget
+    - Handling login/logout state
+    - Displaying appropriate navigation menu upon successful authentication
+    - Showing error messages for failed authentication attempts
+    
+    The function uses session state to persist authentication status across
+    Streamlit reruns and forces a rerun upon successful login.
+    
+    Returns:
+        None
+        
+    Side Effects:
+        - Modifies st.session_state with authentication data
+        - Applies custom CSS styling to the UI
+        - Calls st.rerun() upon successful authentication
+        - Displays navigation menu for authenticated users
+        - Shows login form for unauthenticated users
+        
+    Raises:
+        FileNotFoundError: If config.yaml is not found
+        yaml.YAMLError: If config.yaml is malformed
+    """
     constants = Constants()
     
     st.markdown("""

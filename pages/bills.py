@@ -1,3 +1,10 @@
+"""
+Utility Bills Analysis Page.
+
+This is the main page for utility bills analysis, providing a tabbed interface
+for file upload, KPI visualization, and comparative analysis.
+"""
+
 import pandas as pd
 import streamlit as st  
 from io import BytesIO

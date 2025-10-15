@@ -1,9 +1,16 @@
+"""
+CPS Utilities Management App - Main Application Entry Point.
+
+This is the main entry point for the Streamlit-based utilities management application.
+It handles session state initialization, authentication, and navigation setup.
+
+To run: streamlit run app.py
+"""
+
 import streamlit as st
 import pandas as pd
 from src.authentication import authenticate
 from constants import Constants
-
-# streamlit run app.py
 
 # Initialize session state
 if 'name' not in st.session_state:

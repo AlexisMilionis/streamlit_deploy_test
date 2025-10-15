@@ -1,9 +1,36 @@
 
+"""
+Bill Tab 2 - KPIs & Metrics view for the Bills page.
+
+This module provides the second tab interface for displaying bill KPIs,
+interactive charts, and searchable metrics for buildings and supply IDs.
+"""
+
 import streamlit as st
 from src.generate_metrics import Metrics
 from src.search_bar import SearchBar
 
-def create_tab2():
+def create_tab2() -> None:
+    """
+    Create and render the KPIs and metrics tab interface.
+    
+    This function provides:
+    - Overall bill-level metrics and visualizations
+    - Interactive search bar for buildings and supply IDs
+    - Drill-down metrics for selected buildings or supply IDs
+    - Donut charts for debt distribution
+    - Time series charts for consumption and costs
+    
+    The function uses data from st.session_state.df_portfolio which must
+    be set by the file upload tab.
+    
+    Returns:
+        None
+        
+    Side Effects:
+        - Renders KPIs, charts, and search interface in the Streamlit UI
+        - Applies custom CSS styling for consistent font sizes
+    """
     
     st.write("")
     st.subheader("Bill Metrics")

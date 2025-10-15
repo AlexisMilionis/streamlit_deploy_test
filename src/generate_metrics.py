@@ -1,16 +1,53 @@
+"""
+Metrics generation and visualization module for the Streamlit application.
+
+This module provides the Metrics class for generating KPIs, charts, and visualizations
+from utility bill portfolio data. It supports multi-level analysis (bill, building, supply ID)
+and creates interactive Plotly charts for debt distribution and time series analysis.
+"""
+
 import streamlit as st
-# import matplotlib.pyplot as plt
-# import seaborn as sns
-from constants import Constants
 import plotly.express as px
 import pandas as pd
-# Create figure with secondary y-axis
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
+from constants import Constants
+from typing import Optional, Literal, Any
 
 class Metrics:
+    """
+    A class for generating metrics and visualizations from utility bill portfolio data.
     
-    def __init__(self, portfolio, level='bill', dropdown_selection=None):
+    This class processes portfolio data and generates various KPIs and charts at different
+    aggregation levels (bill, building, or supply ID). It calculates consumption and debt
+    metrics, creates donut charts for debt distribution, and generates time series
+    visualizations for historical analysis.
+    
+    Attributes:
+        portfolio (pd.DataFrame): The filtered portfolio DataFrame for analysis.
+        level (str): Analysis level ('bill', 'building', or 'supply_id').
+        dropdown_selection (Optional[Any]): Selected building address or supply ID for filtering.
+        is_valid (bool): Flag indicating if the metrics instance has valid data.
+        debt_per_type (pd.DataFrame): Aggregated debt grouped by bill type.
+        supply_ids (np.ndarray): Unique supply IDs in the filtered portfolio.
+        building_ids (np.ndarray): Unique building addresses in the filtered portfolio.
+        timeseries_data (pd.DataFrame): Historical time series data for the selected level.
+    """
+    
+    def __init__(self, portfolio: pd.DataFrame, level: Literal['bill', 'building', 'supply_id'] = 'bill', dropdown_selection: Optional[Any] = None) -> None:
+        """
+        Initialize the Metrics instance with portfolio data and analysis level.
+        
+        Args:
+            portfolio (pd.DataFrame): The portfolio DataFrame containing bill data.
+            level (Literal['bill', 'building', 'supply_id'], optional): The aggregation level
+                for analysis. Defaults to 'bill'.
+            dropdown_selection (Optional[Any], optional): Building address (str) or supply ID (int)
+                to filter data when level is 'building' or 'supply_id'. Defaults to None.
+        
+        Returns:
+            None
+        """
         self.portfolio = portfolio
         self.level = level
         self.dropdown_selection = dropdown_selection
@@ -46,7 +83,18 @@ class Metrics:
         self.is_valid = True
 
     @staticmethod
-    def _filter_portfolio_by_level(data, level, dropdown_selection):
+    def _filter_portfolio_by_level(data: pd.DataFrame, level: str, dropdown_selection: Optional[Any]) -> Optional[pd.DataFrame]:
+        """
+        Filter portfolio data based on the specified aggregation level.
+        
+        Args:
+            data (pd.DataFrame): The portfolio DataFrame to filter.
+            level (str): The aggregation level ('bill', 'building', or 'supply_id').
+            dropdown_selection (Optional[Any]): The value to filter by (building address or supply ID).
+        
+        Returns:
+            Optional[pd.DataFrame]: Filtered DataFrame based on level, or None if level is invalid.
+        """
         if level == 'bill':
             return data
         elif level == 'building':
@@ -54,9 +102,25 @@ class Metrics:
         elif level == 'supply_id':
             return data[data['ΑΡ.ΠΑΡΟΧΗΣ']==dropdown_selection]
         else:
-            return
+            return None
 
-    def build_kpis(self):
+    def build_kpis(self) -> None:
+        """
+        Display key performance indicators (KPIs) as Streamlit metrics.
+        
+        Renders metrics for:
+        - Total debt in euros
+        - Total consumption in cubic meters
+        - Number of buildings (bill level only)
+        - Number of supply IDs (bill and building level)
+        
+        Returns:
+            None
+            
+        Side Effects:
+            - Displays metric widgets in the Streamlit UI
+            - Returns early if instance is not valid
+        """
         if not self.is_valid:
             return
         # st.subheader("KPIs")
@@ -73,7 +137,21 @@ class Metrics:
         elif self.level == 'building':
             st.metric(label="Number of Supply IDs", value=f"{len(self.supply_ids):,}")
 
-    def build_donut_chart(self):
+    def build_donut_chart(self) -> None:
+        """
+        Create and display a donut chart showing debt distribution by bill type.
+        
+        Generates an interactive Plotly pie chart with a hole in the center (donut style)
+        showing how total debt is distributed across different bill types. Uses custom
+        color scheme from Constants.
+        
+        Returns:
+            None
+            
+        Side Effects:
+            - Displays a Plotly chart in the Streamlit UI
+            - Returns early if instance is not valid
+        """
         if not self.is_valid:
             return
         fig = px.pie(
@@ -87,7 +165,20 @@ class Metrics:
         key = f"donut_{self.level}_{self.dropdown_selection}"
         st.plotly_chart(fig, use_container_width=True, key=key)
         
-    def build_barchart(self):
+    def build_barchart(self) -> None:
+        """
+        Create and display a bar chart showing debt distribution by bill type.
+        
+        Generates an interactive Plotly bar chart showing total debt for each bill type.
+        Uses a dual-color scheme from Constants for visual distinction.
+        
+        Returns:
+            None
+            
+        Side Effects:
+            - Displays a Plotly chart in the Streamlit UI
+            - Returns early if instance is not valid
+        """
         if not self.is_valid:
             return
         fig = px.bar(
@@ -99,7 +190,25 @@ class Metrics:
         )
         st.plotly_chart(fig, use_container_width=True)
         
-    def build_cost_timeseries(self):
+    def build_cost_timeseries(self) -> None:
+        """
+        Create and display a time series chart with debt and consumption over time.
+        
+        Generates a dual-axis Plotly chart showing monthly trends for:
+        - Bill debt (left y-axis, in euros)
+        - Water consumption (right y-axis, in cubic meters)
+        
+        The chart uses historical time series data and displays months in a readable
+        format (e.g., "Jan 2024"). Data is aggregated by month from the Processed_Month column.
+        
+        Returns:
+            None
+            
+        Side Effects:
+            - Displays a Plotly chart with dual y-axes in the Streamlit UI
+            - Shows warning message if no time series data is available
+            - Returns early if instance is not valid
+        """
         if not self.is_valid:
             return
         if self.timeseries_data is None or self.timeseries_data.empty:

@@ -1,3 +1,10 @@
+"""
+Bill Tab 1 - File Upload & Validation view for the Bills page.
+
+This module provides the first tab interface for uploading utility bill files,
+validating data quality, and updating time series databases.
+"""
+
 import pandas as pd
 import streamlit as st  
 from src.single_file_checks import MonthlyDataChecks 
@@ -6,7 +13,30 @@ from src.update_timeseries import TimeSeriesUpdate
 from src.update_masterfile import MasterFileUpdate
 from src.generate_metrics import Metrics
 
-def create_tab1():
+def create_tab1() -> None:
+    """
+    Create and render the file upload and validation tab interface.
+    
+    This function provides a complete workflow for:
+    - Portfolio type selection (Eurobank or Management)
+    - File upload with custom styling
+    - Excel sheet selection for multi-sheet files
+    - Data quality validation
+    - Time series database updates
+    - Master file updates with new supply IDs
+    
+    The processed data is stored in session state for use in other tabs.
+    
+    Returns:
+        None
+        
+    Side Effects:
+        - Renders file upload UI with custom CSS styling
+        - Updates st.session_state.df_portfolio with uploaded data
+        - Updates st.session_state.tab1_completed flag
+        - Updates st.session_state.processed_file with file identifier
+        - Displays validation messages and progress indicators
+    """
     
     st.write("")
     # Custom CSS for file uploader

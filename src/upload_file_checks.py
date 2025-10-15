@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
-from typing import Optional
+from typing import Optional, Any
+from streamlit.runtime.uploaded_file_manager import UploadedFile
 
 class UploadedFileCheck:
     """
@@ -11,20 +12,23 @@ class UploadedFileCheck:
     when needed.
     
     Attributes:
-        uploaded_file: The uploaded file object to be processed.
-        unique_id: A unique identifier for the instance.
-        excel_file: The pandas ExcelFile object.
-        sheet_names: List of sheet names in the Excel file.
-        df: The loaded DataFrame.
+        uploaded_file (UploadedFile): The uploaded file object to be processed.
+        unique_id (str): A unique identifier for the instance.
+        excel_file (pd.ExcelFile): The pandas ExcelFile object.
+        sheet_names (list[str]): List of sheet names in the Excel file.
+        df (pd.DataFrame): The loaded DataFrame.
     """
     
-    def __init__(self, uploaded_file, unique_id: str = "") -> None:
+    def __init__(self, uploaded_file: UploadedFile, unique_id: str = "") -> None:
         """
         Initialize the UploadedFileCheck instance.
         
         Args:
-            uploaded_file: The uploaded file object (typically from Streamlit file uploader).
-            unique_id: A unique identifier for the instance.
+            uploaded_file (UploadedFile): The uploaded file object (typically from Streamlit file uploader).
+            unique_id (str, optional): A unique identifier for the instance. Defaults to "".
+            
+        Returns:
+            None
         """
         with st.status("Loading file..."):
             self.uploaded_file = uploaded_file
@@ -38,8 +42,12 @@ class UploadedFileCheck:
         Check if the Excel file contains multiple sheets and handle sheet selection.
         
         If the uploaded Excel file contains multiple sheets, presents a selectbox
-        to the user for sheet selection. If only one sheet exists, automatically 
-        loads that sheet.
+        to the user for sheet selection using Streamlit's UI. The selection is stored
+        in session state to persist across reruns. If only one sheet exists, automatically 
+        loads that sheet without user interaction.
+        
+        The method applies custom CSS styling for a dark theme selectbox and manages
+        the sheet selection workflow through Streamlit's session state.
         
         Returns:
             Optional[pd.DataFrame]: A pandas DataFrame containing the data from the 
@@ -49,6 +57,12 @@ class UploadedFileCheck:
         Raises:
             Exception: If the file cannot be read as an Excel file or if there
                       are issues with sheet access.
+                      
+        Side Effects:
+            - Modifies st.session_state with sheet selection data
+            - Calls st.rerun() when a valid sheet is selected
+            - Displays file information via display_uploaded_file_info()
+            - Applies custom CSS styling to the Streamlit UI
         """
         try:
             
@@ -207,10 +221,23 @@ class UploadedFileCheck:
         
     def display_uploaded_file_info(self) -> None:
         """
-        Display information about the uploaded file.
+        Display information about the uploaded file in a formatted metrics layout.
         
-        Shows metrics for the number of rows, columns, and file size
-        in a three-column layout.
+        Shows three key metrics about the uploaded Excel file:
+        - Number of rows in the DataFrame
+        - Number of columns in the DataFrame
+        - File size in bytes
+        
+        The metrics are displayed in a three-column layout using Streamlit's
+        column and metric components. Custom CSS styling is applied to control
+        the font sizes of metric labels and values.
+        
+        Returns:
+            None
+            
+        Side Effects:
+            - Applies custom CSS styling to Streamlit metric components
+            - Displays three metric widgets in the Streamlit UI
         """
         
         st.markdown("""
