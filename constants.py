@@ -87,4 +87,20 @@ class Constants:
     
     MASTERFILE_PATH = "data/"
     
+    BACKGROUND_COLOR = "#0a1b38"
+    
     PRIMARY_COLOR = "#0db1f2"
+    
+    DONUT_COLORING = [ # from darker to lighter
+        "rgb(8,106,145)",
+        "rgb(10,142,194)",
+        "rgb(13,177,242)",
+        "rgb(61,193,245)",
+        "rgb(110,208,247)",
+        "rgb(158,224,250)",
+    ]
+    
+    DUAL_COLORING = [
+        "rgb(10,102,194)",  # skouro
+        "rgb(158,224,250)",  # anoixto
+    ]
