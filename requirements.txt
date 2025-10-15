@@ -6,4 +6,4 @@ streamlit-authenticator
 mplcursors
 matplotlib
 seaborn
-plotly
+streamlit-searchbox
