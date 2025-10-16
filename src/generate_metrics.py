@@ -190,7 +190,7 @@ class Metrics:
         )
         st.plotly_chart(fig, use_container_width=True)
         
-    def build_cost_timeseries(self) -> None:
+    def build_timeseries(self, yaxis="debt") -> None:
         """
         Create and display a time series chart with debt and consumption over time.
         
@@ -221,8 +221,17 @@ class Metrics:
         for i, month in enumerate(processed_month):
             monthly_data = self.timeseries_data[self.timeseries_data['Processed_Month'] == month]
             # month_bills = month_data[month_data['ΤΥΠΟΣ ΛΟΓΑΡΙΑΣΜΟΥ'].isin(self.billing_account_fields)]
-            monthly_consumption = monthly_data['consumption'].sum()
-            monthly_debt = monthly_data['ΟΦΕΙΛΗ'].sum()
+            if yaxis == "consumption":
+                monthly_metric = monthly_data['consumption'].sum()
+                name = "Consumption (m³)"
+                col = 'consumption'
+            elif yaxis == "debt":
+                monthly_metric = monthly_data['ΟΦΕΙΛΗ'].sum()
+                name = "Bill Debt (€)"
+                col = 'ΟΦΕΙΛΗ'
+                
+            # monthly_consumption = monthly_data['consumption'].sum()
+            # monthly_debt = monthly_data['ΟΦΕΙΛΗ'].sum()
             
             # Convert YYYYMM format to readable date
             year = int(str(month)[:4])
@@ -232,8 +241,7 @@ class Metrics:
             monthly_data_display.append({
                 'Month': month,
                 'Month_Label': month_label,
-                'Consumption': monthly_consumption,
-                'Debt': monthly_debt
+                'Metric': monthly_metric
             })
             
         df = pd.DataFrame(monthly_data_display)
@@ -243,29 +251,110 @@ class Metrics:
         
         # Add debt trace (left y-axis)
         fig.add_trace(
-            go.Scatter(x=df['Month_Label'], y=df['Debt'], name="Bill Debt (€)", 
-                    line=dict(color=Constants.PRIMARY_COLOR, width=2)),
+            go.Scatter(x=df['Month_Label'], 
+                       y=df['Metric'], 
+                       name=name, 
+                       line=dict(color=Constants.PRIMARY_COLOR, width=2),
+                       hovertemplate='%{x}<br>' + name + ': %{y:,.2f}<extra></extra>',
+            ),
             secondary_y=False,
         )
         
-        # Add consumption trace (right y-axis)
-        fig.add_trace(
-            go.Scatter(x=df['Month_Label'], y=df['Consumption'], name="Consumption (m³)", 
-                    line=dict(color='#FF6B6B', width=2)),
-            secondary_y=True,
-        )
+        # # Add consumption trace (right y-axis)
+        # fig.add_trace(
+        #     go.Scatter(x=df['Month_Label'], y=df['Consumption'], name="Consumption (m³)", 
+        #             line=dict(color='#FF6B6B', width=2)),
+        #     secondary_y=True,
+        # )
         
         # Update axes labels
         fig.update_xaxes(title_text="Month")
-        fig.update_yaxes(title_text="Bill Debt (€)", secondary_y=False)
-        fig.update_yaxes(title_text="Consumption (m³)", secondary_y=True)
+        fig.update_yaxes(title_text=name, secondary_y=False)
+        # fig.update_yaxes(title_text="Consumption (m³)", secondary_y=True)
         
         fig.update_layout(
-            title_text="Monthly Debt vs Consumption",
-            hovermode='x unified'
+            title_text=f"Monthly {name}",
+            # hovermode='x unified'
         )
         
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=True)    
+    
+    # def build_cost_timeseries(self) -> None:
+    #     """
+    #     Create and display a time series chart with debt and consumption over time.
+        
+    #     Generates a dual-axis Plotly chart showing monthly trends for:
+    #     - Bill debt (left y-axis, in euros)
+    #     - Water consumption (right y-axis, in cubic meters)
+        
+    #     The chart uses historical time series data and displays months in a readable
+    #     format (e.g., "Jan 2024"). Data is aggregated by month from the Processed_Month column.
+        
+    #     Returns:
+    #         None
+            
+    #     Side Effects:
+    #         - Displays a Plotly chart with dual y-axes in the Streamlit UI
+    #         - Shows warning message if no time series data is available
+    #         - Returns early if instance is not valid
+    #     """
+    #     if not self.is_valid:
+    #         return
+    #     if self.timeseries_data is None or self.timeseries_data.empty:
+    #         st.warning("No data available to plot time series.")
+    #         return
+
+    #     processed_month = self.timeseries_data['Processed_Month'].unique()
+    #     monthly_data_display = []
+        
+    #     for i, month in enumerate(processed_month):
+    #         monthly_data = self.timeseries_data[self.timeseries_data['Processed_Month'] == month]
+    #         # month_bills = month_data[month_data['ΤΥΠΟΣ ΛΟΓΑΡΙΑΣΜΟΥ'].isin(self.billing_account_fields)]
+    #         monthly_consumption = monthly_data['consumption'].sum()
+    #         monthly_debt = monthly_data['ΟΦΕΙΛΗ'].sum()
+            
+    #         # Convert YYYYMM format to readable date
+    #         year = int(str(month)[:4])
+    #         month_num = int(str(month)[4:6])
+    #         month_label = pd.to_datetime(f"{year}-{month_num:02d}-01").strftime('%b %Y')
+            
+    #         monthly_data_display.append({
+    #             'Month': month,
+    #             'Month_Label': month_label,
+    #             'Consumption': monthly_consumption,
+    #             'Debt': monthly_debt
+    #         })
+            
+    #     df = pd.DataFrame(monthly_data_display)
+    #     df = df.sort_values('Month')
+        
+    #     fig = make_subplots(specs=[[{"secondary_y": True}]])
+        
+    #     # Add debt trace (left y-axis)
+    #     fig.add_trace(
+    #         go.Scatter(x=df['Month_Label'], y=df['Debt'], name="Bill Debt (€)", 
+    #                 line=dict(color=Constants.PRIMARY_COLOR, width=2)),
+    #         secondary_y=False,
+    #     )
+        
+    #     # Add consumption trace (right y-axis)
+    #     fig.add_trace(
+    #         go.Scatter(x=df['Month_Label'], y=df['Consumption'], name="Consumption (m³)", 
+    #                 line=dict(color='#FF6B6B', width=2)),
+    #         secondary_y=True,
+    #     )
+        
+    #     # Update axes labels
+    #     fig.update_xaxes(title_text="Month")
+    #     fig.update_yaxes(title_text="Bill Debt (€)", secondary_y=False)
+    #     fig.update_yaxes(title_text="Consumption (m³)", secondary_y=True)
+        
+    #     fig.update_layout(
+    #         title_text="Monthly Debt vs Consumption",
+    #         hovermode='x unified'
+    #     )
+        
+    #     st.plotly_chart(fig, use_container_width=True)
 
 
 # class Metrics:
