@@ -45,7 +45,11 @@ def create_tab2() -> None:
         bill_metrics.build_kpis()
     with col2:
         bill_metrics.build_donut_chart()
-    bill_metrics.build_cost_timeseries()
+    col1, col2 = st.columns(2)
+    with col1:
+        bill_metrics.build_timeseries(yaxis='debt')
+    with col2:
+        bill_metrics.build_timeseries(yaxis='consumption')
     
     # st.write("")
     # st.subheader("Building Metrics", divider="grey")
@@ -121,36 +125,65 @@ def create_tab2() -> None:
     search_bar = SearchBar(st.session_state.df_portfolio)
     
     selected_option = search_bar.building_searchbox()
-    if selected_option is not None and selected_option in (st.session_state.df_portfolio['ΔΙΕΥΘΥΝΣΗ'].unique().tolist()):
-
-        st.write(f"Selected Building: {selected_option}")
-        building_metrics = Metrics(st.session_state.df_portfolio,
-                                level='building',
-                                dropdown_selection=selected_option,
-                                )
+    
+    selection_list = st.session_state.df_portfolio['ΔΙΕΥΘΥΝΣΗ'].unique().tolist() + st.session_state.df_portfolio['ΑΡ.ΠΑΡΟΧΗΣ'].unique().tolist()
+    if selected_option is not None and selected_option in selection_list:
+        st.write(f"Selected Option: {selected_option}")
+        if selected_option in (st.session_state.df_portfolio['ΔΙΕΥΘΥΝΣΗ'].unique().tolist()):
+            option_metrics = Metrics(st.session_state.df_portfolio,
+                                    level='building',
+                                    dropdown_selection=selected_option,
+                                    )
+        elif selected_option in (st.session_state.df_portfolio['ΑΡ.ΠΑΡΟΧΗΣ'].unique().tolist()):
+            option_metrics = Metrics(st.session_state.df_portfolio,
+                                    level='supply_id',
+                                    dropdown_selection=selected_option,
+                                    )
         col1, col2 = st.columns(2)
         with col1:
-            building_metrics.build_kpis()
+            option_metrics.build_kpis()
         with col2:
-            building_metrics.build_donut_chart()
-        building_metrics.build_cost_timeseries()
-
-    elif selected_option is not None and selected_option in (st.session_state.df_portfolio['ΑΡ.ΠΑΡΟΧΗΣ'].unique().tolist()):
-        st.write(f"Selected Supply ID: {selected_option}")
-        supply_metrics = Metrics(st.session_state.df_portfolio,
-                                level='supply_id',
-                                dropdown_selection=selected_option,
-                                )
+            option_metrics.build_donut_chart()
         col1, col2 = st.columns(2)
         with col1:
-            supply_metrics.build_kpis()
+            option_metrics.build_timeseries(yaxis='debt')
         with col2:
-            supply_metrics.build_donut_chart()
-        supply_metrics.build_cost_timeseries()
+            option_metrics.build_timeseries(yaxis='consumption')
+            
+    elif selected_option is not None and selected_option not in selection_list:
+        st.info("Please select a valid Building or Supply ID from the search box above to view metrics.")
+        
+
+    # if selected_option is not None and selected_option in (st.session_state.df_portfolio['ΔΙΕΥΘΥΝΣΗ'].unique().tolist()):
+
+    #     st.write(f"Selected Building: {selected_option}")
+    #     building_metrics = Metrics(st.session_state.df_portfolio,
+    #                             level='building',
+    #                             dropdown_selection=selected_option,
+    #                             )
+    #     col1, col2 = st.columns(2)
+    #     with col1:
+    #         building_metrics.build_kpis()
+    #     with col2:
+    #         building_metrics.build_donut_chart()
+    #     building_metrics.build_timeseries()
+
+    # elif selected_option is not None and selected_option in (st.session_state.df_portfolio['ΑΡ.ΠΑΡΟΧΗΣ'].unique().tolist()):
+    #     st.write(f"Selected Supply ID: {selected_option}")
+    #     supply_metrics = Metrics(st.session_state.df_portfolio,
+    #                             level='supply_id',
+    #                             dropdown_selection=selected_option,
+    #                             )
+    #     col1, col2 = st.columns(2)
+    #     with col1:
+    #         supply_metrics.build_kpis()
+    #     with col2:
+    #         supply_metrics.build_donut_chart()
+    #     supply_metrics.build_timeseries()
         
     # elif selected_option is None:
     #     st.info("Please select a valid Building or Supply ID from the search box above to view metrics.")
-        # building_metrics.build_scatterplot()
+    #     building_metrics.build_scatterplot()
     
     # bill_metrics.build_scatterplot()
     
